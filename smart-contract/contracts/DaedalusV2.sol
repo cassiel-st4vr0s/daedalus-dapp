@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-// === IMPORTAÇÕES CORRIGIDAS E NECESSÁRIAS ===
+// === IMPORTS ===
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/common/ERC2981.sol"; // Caminho corrigido
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 /**
  * @title DaedalusV2
- * @notice Contrato MVP compatível com OpenZeppelin v5.x.
+ * @notice Contrato compatível com OpenZeppelin v5.x.
  */
 contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
 
-    // === VARIÁVEIS DE ESTADO (Sem alterações) ===
+    // === VARIÁVEIS DE ESTADO ===
     uint256 private _nextTokenId = 1; // Inicia em 1 para evitar tokenId 0
 
     struct Artwork {
@@ -24,12 +24,12 @@ contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
 
     mapping(uint256 => Artwork) private _artworks;
 
-    // === CONSTRUTOR (Sem alterações) ===
+    // === CONSTRUTOR ===
     constructor() ERC721("Daedalus Artwork", "DAED") Ownable(msg.sender) {
         _setDefaultRoyalty(msg.sender, 500); // 5%
     }
 
-    // === FUNÇÕES PRINCIPAIS (Sem alterações na lógica interna) ===
+    // === FUNÇÕES PRINCIPAIS ===
 
     function mintArtwork(string memory metadataURI_, uint256 price_) public {
         uint256 tokenId = _nextTokenId;
@@ -67,7 +67,7 @@ contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
         _artworks[tokenId].price = newPrice_;
     }
 
-    // === FUNÇÕES DE LEITURA (Sem alterações) ===
+    // === FUNÇÕES DE LEITURA ===
 
     function getPrice(uint256 tokenId) public view returns (uint256) {
         return _artworks[tokenId].price;
@@ -83,8 +83,6 @@ contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
 
     /**
      * @dev Hook que é chamado antes de qualquer transferência de token.
-     * Em OZ v5, _update substitui o papel do antigo _beforeTokenTransfer para
-     * a lógica principal de transferência.
      */
     function _update(address to, uint256 tokenId, address auth)
         internal
@@ -106,7 +104,7 @@ contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
     }
     
     /**
-     * @notice Sobrescreve a função tokenURI para usar nossa URI de metadados customizada.
+     * @notice Sobrescreve a função tokenURI para usar a URI de metadados.
      */
     function tokenURI(uint256 tokenId)
         public
@@ -119,8 +117,7 @@ contract DaedalusV2 is ERC721, ERC721Enumerable, Ownable, ERC2981 {
     }
 
     /**
-     * @notice Declara ao mundo quais interfaces (padrões) este contrato suporta.
-     * Essencial para a interoperabilidade.
+     * @notice Declara quais interfaces este contrato suporta.
      */
     function supportsInterface(bytes4 interfaceId)
         public
