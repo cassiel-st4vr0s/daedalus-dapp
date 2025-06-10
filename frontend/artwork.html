@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Obra - Daedalus DApp</title>
+    <link href="/assets/css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <header class="p-4 bg-gray-800 shadow-lg mb-8">
+        <a href="/" class="text-teal-400 hover:text-teal-300">← Voltar para a Galeria</a>
+    </header>
+
+    <main id="artwork-detail-container" class="container mx-auto p-4">
+        <!-- O conteúdo será preenchido pelo JavaScript -->
+        <p id="loading-message" class="text-center text-gray-400">Carregando detalhes da obra...</p>
+        <div id="error-container" class="text-center text-red-500"></div>
+    </main>
+
+    <!-- Scripts JS: reutilizamos api.js, mas precisamos de um novo orquestrador -->
+    <script src="/js/api.js"></script>
+    <script src="/js/wallet.js"></script>
+    <script src="/js/artwork-detail.js"></script>
+</body>
+
+</html>

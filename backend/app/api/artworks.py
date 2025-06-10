@@ -1,7 +1,8 @@
 # app/api/artworks.py
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.schemas.artwork import Artwork
+
 
 router = APIRouter()
 
@@ -34,3 +35,20 @@ def get_artworks():
     Endpoint para listar todas as obras de arte (atualmente com dados mocados).
     """
     return mock_artworks_data
+
+
+@router.get("/artworks/{token_id}", response_model=Artwork, tags=["Artworks"])
+def get_artwork_details(token_id: int):
+    """
+    Endpoint para obter os detalhes de uma única obra de arte.
+    """
+    # Procura na nossa lista mocada pela obra com o token_id correspondente
+    artwork = next(
+        (item for item in mock_artworks_data if item["token_id"] == token_id), None
+    )
+
+    if artwork is None:
+        # Se a obra não for encontrada, lança uma exceção HTTP 404
+        raise HTTPException(status_code=404, detail="Obra de arte não encontrada")
+
+    return artwork
