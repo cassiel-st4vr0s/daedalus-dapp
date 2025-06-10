@@ -1,8 +1,8 @@
 # app/api/artworks.py
 from typing import List
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 from app.schemas.artwork import Artwork
-
+from app.services import ipfs_service
 
 router = APIRouter()
 
@@ -52,3 +52,27 @@ def get_artwork_details(token_id: int):
         raise HTTPException(status_code=404, detail="Obra de arte não encontrada")
 
     return artwork
+
+
+@router.post("/artworks", status_code=201, tags=["Artworks"])
+async def create_artwork(
+    file: UploadFile = File(...),
+    name: str = Form(...),
+    description: str = Form(...),
+    price: str = Form(...),
+    # Obs: No sistema definitivo, o endereço do criador viria de um token de autenticação.
+    # Mas no MVP vamos simular isso, o frontend deve enviar o endereço do usuário conectado.
+    creator_address: str = Form(...),
+):
+    """
+    Endpoint para criar uma nova obra: faz o upload do arquivo e metadados para o IPFS.
+    Retorna a URI dos metadados para ser usada na transação de mint.
+    """
+    metadata_uri = await ipfs_service.upload_to_ipfs(
+        file=file,
+        name=name,
+        description=description,
+        price=price,
+        creator_address=creator_address,
+    )
+    return {"metadata_uri": metadata_uri}
