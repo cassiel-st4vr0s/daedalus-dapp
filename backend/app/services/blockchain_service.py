@@ -74,8 +74,10 @@ def get_artwork_by_id(token_id: int):
         print(f"Erro ao buscar dados on-chain para o token {token_id}: {e}")
         return None
 
-    # Busca metadados do IPFS
-    ipfs_url = f"https://gateway.pinata.cloud/ipfs/{metadata_hash}"
+    # Busca metadados do IPFS usando o gateway dedicado
+    ipfs_url = (
+        f"https://moccasin-calm-butterfly-250.mypinata.cloud/ipfs/{metadata_hash}"
+    )
     try:
         with httpx.Client(timeout=10.0) as client:
             response = client.get(ipfs_url)
@@ -97,7 +99,7 @@ def get_artwork_by_id(token_id: int):
             "token_id": token_id,
             "name": metadata.get("name", f"Obra #{token_id}"),
             "image_url": metadata.get("image", "").replace(
-                "ipfs://", "https://gateway.pinata.cloud/ipfs/"
+                "ipfs://", "https://moccasin-calm-butterfly-250.mypinata.cloud/ipfs/"
             ),
             "price": float(w3.from_wei(price_in_wei, "ether")),
             "creator": creator,
