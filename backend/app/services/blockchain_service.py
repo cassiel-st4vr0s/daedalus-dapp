@@ -33,6 +33,8 @@ checksum_contract_address = w3.to_checksum_address(CONTRACT_ADDRESS)
 # Cria a instância do contrato usando o endereço checksumado
 contract = w3.eth.contract(address=checksum_contract_address, abi=CONTRACT_ABI)
 
+metadata_cache = {}
+
 
 def get_all_artworks():
     """
@@ -54,48 +56,54 @@ def get_all_artworks():
 
 def get_artwork_by_id(token_id: int):
     """
-    Busca os dados de um único NFT on-chain e seus metadados do IPFS.
-    Retorna None se o token ou seus metadados não puderem ser recuperados.
+    Busca os dados de um único NFT, utilizando um cache para os metadados do IPFS.
     """
     try:
-        # Busca dados on-chain
         owner = contract.functions.ownerOf(token_id).call()
+
+        # 1. VERIFICA O CACHE PRIMEIRO
+        if token_id in metadata_cache:
+            print(f"INFO: Metadados para o token {token_id} encontrados no cache.")
+            return _format_artwork_data(token_id, metadata_cache[token_id], owner)
+
+        # 2. SE NÃO ESTÁ NO CACHE, BUSCA DO IPFS
         metadata_hash = (
             contract.functions.tokenURI(token_id).call().replace("ipfs://", "")
         )
-
-        # Se o hash dos metadados estiver vazio o token é inválido.
         if not metadata_hash:
-            print(f"AVISO: Token {token_id} não possui metadataURI. Ignorando.")
             return None
 
-    except Exception as e:
-        # Se qualquer chamada on-chain falhar retorna None.
-        print(f"Erro ao buscar dados on-chain para o token {token_id}: {e}")
-        return None
-
-    # Busca metadados do IPFS usando o gateway dedicado
-    ipfs_url = (
-        f"https://moccasin-calm-butterfly-250.mypinata.cloud/ipfs/{metadata_hash}"
-    )
-    try:
+        ipfs_url = (
+            f"https://moccasin-calm-butterfly-250.mypinata.cloud/ipfs/{metadata_hash}"
+        )
         with httpx.Client(timeout=10.0) as client:
             response = client.get(ipfs_url)
-            response.raise_for_status()  # Lança erro para status
+            response.raise_for_status()
             metadata = response.json()
+
+            # Armazena os metadados no cache para uso futuro
+            metadata_cache[token_id] = metadata
+            print(
+                f"INFO: Metadados para o token {token_id} buscados do IPFS e cacheados."
+            )
+
+            return _format_artwork_data(token_id, metadata, owner)
+
     except Exception as e:
-        # Se a busca no IPFS falhar
-        print(
-            f"AVISO: Falha ao buscar metadados do IPFS para o token {token_id} (hash: {metadata_hash}): {e}"
-        )
+        print(f"AVISO: Falha ao processar o token {token_id}: {e}")
         return None
 
-    # busca o resto dos dados on-chain e formata
+
+def _format_artwork_data(token_id: int, metadata: dict, owner_address: str):
+    """
+    Função auxiliar para formatar os dados da obra.
+    Busca os dados on-chain restantes (preço, dono, etc.).
+    """
     try:
         creator = contract.functions.getCreator(token_id).call()
         price_in_wei = contract.functions.getPrice(token_id).call()
 
-        artwork_data = {
+        return {
             "token_id": token_id,
             "name": metadata.get("name", f"Obra #{token_id}"),
             "image_url": metadata.get("image", "").replace(
@@ -103,10 +111,9 @@ def get_artwork_by_id(token_id: int):
             ),
             "price": float(w3.from_wei(price_in_wei, "ether")),
             "creator": creator,
-            "owner": owner,
+            "owner": owner_address,
             "is_for_sale": True,
         }
-        return artwork_data
     except Exception as e:
-        print(f"Erro ao finalizar a busca de dados para o token {token_id}: {e}")
+        print(f"Erro ao formatar os dados para o token {token_id}: {e}")
         return None
