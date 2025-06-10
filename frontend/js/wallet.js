@@ -842,3 +842,30 @@ async function purchaseArtwork(tokenId, priceInEth) {
     throw error;
   }
 }
+
+/**
+ * Inicia a transação de mint de uma nova obra de arte.
+ * @param {string} metadataURI - Hash do metadado JSON do IPFS.
+ * @param {string} priceInEth - Preço da obra em ETH (como string).
+ * @returns {Promise<ethers.TransactionResponse>} Resposta da transação.
+ */
+async function mintNFT(metadataURI, priceInEth) {
+  if (!contract || !signer) {
+    throw new Error("Carteira não conectada ou contrato não inicializado.");
+  }
+
+  try {
+    const priceInWei = ethers.parseEther(priceInEth.toString());
+    console.log(
+      `Tentando mintar com URI: ${metadataURI} e Preço: ${priceInWei} Wei`
+    );
+
+    const tx = await contract.mintArtwork(metadataURI, priceInWei);
+    console.log("Transação de mint enviada:", tx.hash);
+    return tx;
+  } catch (error) {
+    console.error("Erro na transação de mint:", error);
+    alert(`A transação de mint falhou: ${error.reason || error.message}`);
+    throw error;
+  }
+}

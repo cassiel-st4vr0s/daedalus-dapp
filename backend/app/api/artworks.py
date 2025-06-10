@@ -1,54 +1,30 @@
-# app/api/artworks.py
 from typing import List
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 from app.schemas.artwork import Artwork
 from app.services import ipfs_service
+from app.services import blockchain_service
 
 router = APIRouter()
-
-# Dados mockados para simular o retorno da blockchain
-mock_artworks_data = [
-    {
-        "token_id": 1,
-        "name": "Cosmic Dream",
-        "image_url": "https://gateway.pinata.cloud/ipfs/QmZgA2C4H3r5B6F7G8H9J0K1L2M3N4P5Q6R7S8T9U0V",
-        "price": 0.01,
-        "creator": "0xCreatorAddress1",
-        "owner": "0xOwnerAddress1",
-        "is_for_sale": True,
-    },
-    {
-        "token_id": 2,
-        "name": "Digital Renaissance",
-        "image_url": "https://gateway.pinata.cloud/ipfs/QmT9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3J4K5L6M7",
-        "price": 0.75,
-        "creator": "0xCreatorAddress2",
-        "owner": "0xOwnerAddress2",
-        "is_for_sale": False,  # Este item já foi "vendido"
-    },
-]
 
 
 @router.get("/artworks", response_model=List[Artwork], tags=["Artworks"])
 def get_artworks():
     """
-    Endpoint para listar todas as obras de arte (atualmente com dados mocados).
+    Endpoint para listar todas as obras de arte, buscando dados da blockchain.
     """
-    return mock_artworks_data
+    artworks_from_chain = blockchain_service.get_all_artworks()
+    return artworks_from_chain
 
 
 @router.get("/artworks/{token_id}", response_model=Artwork, tags=["Artworks"])
 def get_artwork_details(token_id: int):
     """
-    Endpoint para obter os detalhes de uma única obra de arte.
+    Endpoint para obter os detalhes de uma única obra de arte, buscando da blockchain.
     """
-    # Procura na nossa lista mocada pela obra com o token_id correspondente
-    artwork = next(
-        (item for item in mock_artworks_data if item["token_id"] == token_id), None
-    )
+    artwork = blockchain_service.get_artwork_by_id(token_id)
 
     if artwork is None:
-        # Se a obra não for encontrada, lança uma exceção HTTP 404
+        # O serviço retorna None se o token não for encontrado
         raise HTTPException(status_code=404, detail="Obra de arte não encontrada")
 
     return artwork
