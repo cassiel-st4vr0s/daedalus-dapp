@@ -85,10 +85,51 @@ function renderError(message) {
 }
 
 /**
+ * Adiciona o listener de evento ao botão de compra.
+ * @param {string} tokenId
+ * @param {number} price
+ */
+function addBuyButtonListener(tokenId, price) {
+  const buyButton = document.getElementById("buy-button");
+  if (buyButton) {
+    buyButton.addEventListener("click", async () => {
+      // Desabilita o botão para evitar cliques duplos
+      buyButton.disabled = true;
+      buyButton.textContent = "Processando...";
+      buyButton.classList.add("opacity-50", "cursor-not-allowed");
+
+      try {
+        await connectWallet(); // Garante que a carteira está conectada
+
+        const tx = await purchaseArtwork(tokenId, price);
+
+        buyButton.textContent = "Aguardando Confirmação...";
+
+        // Aguarda a transação ser minerada e confirmada na blockchain
+        await tx.wait();
+
+        buyButton.textContent = "Compra Realizada com Sucesso!";
+        buyButton.classList.remove("bg-teal-500", "hover:bg-teal-600");
+        buyButton.classList.add("bg-green-600");
+
+        // Opcional: Recarregar a página para mostrar o novo dono
+        alert("Parabéns! A obra é sua. A página será recarregada.");
+        window.location.reload();
+      } catch (error) {
+        console.error("O processo de compra falhou.", error);
+        // Reabilita o botão em caso de falha
+        buyButton.disabled = false;
+        buyButton.textContent = "Comprar Agora";
+        buyButton.classList.remove("opacity-50", "cursor-not-allowed");
+      }
+    });
+  }
+}
+
+/**
  * Ponto de entrada: executado quando a página de detalhes é carregada.
  */
 document.addEventListener("DOMContentLoaded", async () => {
-  // 1. Pega o ID do token da URL (ex: artwork.html?id=1)
   const params = new URLSearchParams(window.location.search);
   const tokenId = params.get("id");
 
@@ -97,13 +138,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // 2. Busca os dados da obra específica
   try {
     const artwork = await fetchArtworkDetails(tokenId);
-    // 3. Renderiza os detalhes na página
     renderArtworkDetails(artwork);
+
+    // Adiciona o listener de evento AO BOTÃO após renderizar os detalhes
+    if (artwork.is_for_sale) {
+      addBuyButtonListener(artwork.token_id, artwork.price);
+    }
   } catch (error) {
-    // 4. Se falhar, exibe uma mensagem de erro
     renderError(
       `Não foi possível carregar os detalhes da obra. ${error.message}`
     );

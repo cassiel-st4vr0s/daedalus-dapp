@@ -12,7 +12,7 @@ mock_artworks_data = [
         "token_id": 1,
         "name": "Cosmic Dream",
         "image_url": "https://gateway.pinata.cloud/ipfs/QmZgA2C4H3r5B6F7G8H9J0K1L2M3N4P5Q6R7S8T9U0V",
-        "price": 0.2,
+        "price": 0.01,
         "creator": "0xCreatorAddress1",
         "owner": "0xOwnerAddress1",
         "is_for_sale": True,
