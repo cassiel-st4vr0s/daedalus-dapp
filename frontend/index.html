@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +14,14 @@
         <nav class="container mx-auto flex justify-between items-center">
             <h1 class="text-3xl font-bold">Galeria de Obras Daedalus</h1>
 
-            <a href="./mint.html"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                Criar Obra
-            </a>
+            <!-- Container para os links dinâmicos -->
+            <div id="nav-links-container" class="flex items-center space-x-4">
+                <a href="./mint.html"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Criar Obra
+                </a>
+
+            </div>
         </nav>
     </header>
 
@@ -38,6 +43,7 @@
     <!-- Scripts JavaScript (carregados no final para melhor performance) -->
     <script src="./js/api.js"></script>
     <script src="./js/ui.js"></script>
+    <script src="/js/wallet.js"></script>
     <script src="./js/app.js"></script>
 </body>
 
