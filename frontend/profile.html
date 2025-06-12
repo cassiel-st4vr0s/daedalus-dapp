@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Daedalus DApp</title>
+    <link href="/assets/css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <header class="p-4 bg-gray-800 shadow-lg">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-teal-400 hover:text-teal-300">← Voltar para a Galeria</a>
+            <div id="wallet-info-container"></div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <h1 class="text-3xl font-bold mb-6">Minhas Obras</h1>
+
+        <!-- Container principal que muda de acordo com o estado -->
+        <div id="profile-content">
+            <!-- Cenário 1: Prompt para conectar a carteira (visível por padrão) -->
+            <div id="connect-wallet-prompt" class="text-center bg-gray-800 p-8 rounded-lg">
+                <p class="text-xl mb-4">Por favor, conecte sua carteira para ver seu perfil.</p>
+                <button id="connect-wallet-button"
+                    class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-6 rounded-lg transition">
+                    Conectar MetaMask
+                </button>
+            </div>
+
+            <!-- Cenário 2: Galeria do usuário (escondido por padrão) -->
+            <div id="gallery-container" class="hidden"
+                data-grid-classes="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Os cards das obras serão inseridos aqui -->
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"
+        type="application/javascript"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/wallet.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+
+</html>

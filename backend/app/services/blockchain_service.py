@@ -117,3 +117,38 @@ def _format_artwork_data(token_id: int, metadata: dict, owner_address: str):
     except Exception as e:
         print(f"Erro ao formatar os dados para o token {token_id}: {e}")
         return None
+
+
+def get_artworks_by_owner(owner_address: str):
+    """
+    Busca todos os NFTs pertencentes a um endereço específico.
+    """
+    try:
+        # converte o endereço para o formato checksum para ser compatível com a w3.py
+        checksum_owner_address = w3.to_checksum_address(owner_address)
+
+        # obtém o número de tokens que o endereço possui
+        balance = contract.functions.balanceOf(checksum_owner_address).call()
+
+        if balance == 0:
+            return []
+
+        artworks_list = []
+        # itera sobre o balanço para buscar o ID de cada token
+        for i in range(balance):
+            # obtém o ID do token no índice 'i' para o dono especificado
+            token_id = contract.functions.tokenOfOwnerByIndex(
+                checksum_owner_address, i
+            ).call()
+
+            # reutiliza nossa função existente para obter os detalhes do token
+            artwork_details = get_artwork_by_id(token_id)
+            if artwork_details:
+                artworks_list.append(artwork_details)
+
+        return artworks_list
+
+    except Exception as e:
+        # erros podem acontecer se o endereço for inválido
+        print(f"Erro ao buscar artworks para o dono {owner_address}: {e}")
+        return []

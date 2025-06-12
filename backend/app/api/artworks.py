@@ -52,3 +52,12 @@ async def create_artwork(
         creator_address=creator_address,
     )
     return {"metadata_uri": metadata_uri}
+
+
+@router.get("/user/{address}/artworks", response_model=List[Artwork], tags=["User"])
+def get_user_artworks(address: str):
+    """
+    Endpoint para listar todas as obras de arte pertencentes a um endereço específico.
+    """
+    artworks = blockchain_service.get_artworks_by_owner(address)
+    return artworks
