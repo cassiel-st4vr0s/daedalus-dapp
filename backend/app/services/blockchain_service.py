@@ -112,7 +112,7 @@ def _format_artwork_data(token_id: int, metadata: dict, owner_address: str):
             "price": float(w3.from_wei(price_in_wei, "ether")),
             "creator": creator,
             "owner": owner_address,
-            "is_for_sale": True,
+            "is_for_sale": owner_address == creator,
         }
     except Exception as e:
         print(f"Erro ao formatar os dados para o token {token_id}: {e}")
